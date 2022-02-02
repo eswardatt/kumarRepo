@@ -91,4 +91,22 @@
             }
             con.Close();
         }
+        
+        
+        //example if dataset
+        public DataSet GetDataset()
+        {
+            string qry = "select * from tblEmployee; select * from tblDepartment;";
+            SqlConnection connection = new SqlConnection(constr);
+            SqlDataAdapter adapter = new SqlDataAdapter(qry, connection);
+            DataSet ds = new DataSet();
+            adapter.Fill(ds);
+            return ds;
+        }
+        public DataTable GetDepartments()
+        {
+            DataTable dt = new DataTable();
+            dt = GetDataset().Tables[0];
+            return dt;
+        }
     }
