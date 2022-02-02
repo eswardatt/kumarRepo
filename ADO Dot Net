@@ -1,0 +1,94 @@
+ public class Program
+    {
+        public static void Main()
+        {
+            string str= GetConnectionString();
+
+
+            EmployeeData employeeData = new EmployeeData(str);
+            DataTable dt = employeeData.Get();
+            int i = employeeData.GetCount();
+            Console.WriteLine(i);
+           
+            Console.ReadLine();
+        }
+        static private string GetConnectionString()
+        {
+            // To avoid storing the connection string in your code,
+            // you can retrieve it from a configuration file.
+            string str = "Data Source=.;Initial Catalog=SchoolData;Integrated Security=true;";
+            return str;
+        }
+}
+
+
+ public class EmployeeData
+    {
+        string constr;
+        public EmployeeData(string connection)
+        {
+            this.constr = connection;
+        }
+        //example for reader
+        public DataTable Get()
+        {
+            using (SqlConnection connection = new SqlConnection(constr))
+            {
+                string qry = "select Id,Name,email,isTeaching from tblDepartment;";
+                SqlCommand cmd = new SqlCommand(qry, connection);
+                connection.Open();
+                DataTable dataTable = new DataTable();
+                var dataReader = cmd.ExecuteReader();
+                dataTable.Load(dataReader);
+                connection.Close();
+                return dataTable;
+
+            }
+        }
+        //example for reader
+        public int GetCount()
+        {
+            using (SqlConnection connection = new SqlConnection(constr))
+            {
+                string qry = "select count(Id) from tblDepartment;";
+                SqlCommand cmd = new SqlCommand(qry, connection);
+                connection.Open();
+                DataTable dataTable = new DataTable();
+                int count =Convert.ToInt32( cmd.ExecuteScalar());
+                return count;
+
+            }
+        }
+        public DataTable GetEmployee()
+        {
+            DataTable dataTable = new DataTable();
+            string qry = "select Id,Name,email,isTeaching from tblDepartment;";
+            SqlConnection con = new SqlConnection(constr);
+            SqlCommand cmd = new SqlCommand(qry, con);
+            cmd.CommandType = CommandType.Text;
+            SqlDataAdapter sda = new SqlDataAdapter();
+
+            sda.SelectCommand = cmd;
+            using (DataTable dt = new DataTable())
+            {
+                sda.Fill(dt);
+            }
+
+            return dataTable;
+        }
+        //for dml commands
+        //1. ExecuteReader
+        //2. ExecuteScalar
+        //3. ExecuteNonQuery
+        public void Add(string name, string email)
+        {
+            string qry = "insert into tblDepartment(Name,email) values(" + "'" + name + "'," + "'" + email + "'" + ");";
+            SqlConnection con = new SqlConnection(constr);
+            con.Open();
+            using (SqlCommand myCmd = new SqlCommand(qry, con))
+            {
+                myCmd.ExecuteNonQuery();
+            }
+            con.Close();
+        }
+    }
